@@ -1,0 +1,38 @@
+# Build a Docker image from the Dockerfile in the current directory and tag it with <server-name>
+sudo docker build . -t <server-name>
+
+# Create a Docker network with the specified subnet
+sudo docker network create <network-name> --subnet 10.0.0.0/24
+
+# Run a new container named 'databaseContainer' in the created network, with environment variable for MySQL root password, using the 'mysql' image
+sudo docker run --network <network-name> --name databaseContainer -e MYSQL_ROOT_PASSWORD=pass@123 -d mysql
+
+# Run a new container named 'myWebsite', map port 8000 of the host to port 8000 in the container, using the image tagged with <server-name>
+sudo docker run --name myWebsite -p 8000:8000 -d <server-name> 
+
+# Connect the 'myWebsite' container to the created network
+sudo docker network connect <network-name> myWebsite 
+
+# Inspect the details of the created network
+sudo docker inspect <network-name>
+
+# Execute the 'mysql' command in the 'databaseContainer' container, with interactive terminal
+sudo docker exec -it databaseContainer mysql -u root -p
+
+# Inside database container run SQL command to create a new database named 'formdata'
+create database formdata;
+
+# Switch to the 'formdata' database
+use formdata;
+
+# Create a new table named 'records' with columns 'prn' and 'name' if it doesn't already exist
+CREATE TABLE IF NOT EXISTS records (prn VARCHAR(255), name VARCHAR(255));
+
+# After running the server, go to the browser and type localhost:8000 to access the application
+Then go to browser and type localhost:8000
+
+Done!
+
+
+
+

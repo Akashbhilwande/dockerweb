@@ -1,0 +1,130 @@
+create database book;
+use book;
+create table book(
+bookid int primary key,
+title varchar(255),
+price int,
+pages int  
+);
+INSERT INTO book (bookid, title, price, pages) VALUES
+(1, 'The Great Gatsby', 15, 180),
+(2, 'To Kill a Mockingbird', 12, 281),
+(3, '1984', 18, 328),
+(4, 'Pride and Prejudice', 10, 279),
+(5, 'The Catcher in the Rye', 14, 224);
+
+
+
+create table author (
+aid int primary key,
+au_name varchar(255),
+address varchar(255),
+city varchar(255),
+no_pub int
+);
+INSERT INTO author (aid, au_name, address, city, no_pub) VALUES
+(1, 'Jane Austen', '1 Author Lane', 'London', 6),
+(2, 'F. Scott Fitzgerald', '5 Writer''s Block', 'New York', 5),
+(3, 'George Orwell', '10 Fiction St.', 'Manchester', 4),
+(4, 'J.D. Salinger', '8 Recluse Ave', 'New York', 2),
+(5, 'Harper Lee', '15 Pulitzer Blvd', 'Alabama', 2);
+
+
+
+create table writtenby(
+book_ref_id int,
+a_ref_id int,
+foreign key(book_ref_id)
+	references book(bookid)
+    on delete cascade,
+foreign key(a_ref_id)
+	references author(aid)
+    on delete cascade
+);
+
+INSERT INTO writtenby (book_ref_id, a_ref_id) VALUES
+(1, 1), -- Pride and Prejudice by Jane Austen
+(2, 2), -- The Great Gatsby by F. Scott Fitzgerald
+(3, 3), -- 1984 by George Orwell
+(4, 4), -- The Catcher in the Rye by J.D. Salinger
+(5, 5); -- To Kill a Mockingbird by Harper Lee
+
+
+
+create table publisher(
+pid int primary key,
+pb_name varchar(255),
+address varchar(255),
+phone bigint
+);
+drop table publisher;
+INSERT INTO publisher (pid, pb_name, address, phone) VALUES
+(1, 'Penguin Random House', '123 Book St, New York', 1234567890),
+(2, 'HarperCollins Publishers', '456 Publishing Ave, London', 9876543210),
+(3, 'Simon & Schuster', '789 Print Blvd, Los Angeles', 1357924680),
+(4, 'Macmillan Publishers', '101 Literary Lane, Boston', 2468013579),
+(5, 'Hachette Book Group', '555 Paperback Road, Paris', 1122334455);
+
+
+create table publishedby(
+book_ref_id int,
+p_ref_id int,
+no_of_copies int,
+year int,
+foreign key(book_ref_id)
+	references book(bookid)
+    on delete cascade,
+foreign key(p_ref_id)
+	references publisher(pid)
+	on delete cascade
+);
+
+INSERT INTO publishedby (book_ref_id, p_ref_id, no_of_copies, year) VALUES
+(1, 1, 1000, 2005), -- Pride and Prejudice published by Penguin Random House in 2005
+(2, 2, 800, 2010), -- The Great Gatsby published by HarperCollins Publishers in 2010
+(3, 3, 1200, 2015), -- 1984 published by Simon & Schuster in 2015
+(4, 4, 600, 2000), -- The Catcher in the Rye published by Macmillan Publishers in 2000
+(5, 5, 900, 2008); -- To Kill a Mockingbird published by Hachette Book Group in 2008
+
+
+create table supplier(
+sup_id int primary key,
+sup_name varchar(255),
+address varchar(255),
+city varchar(255)
+);
+
+INSERT INTO supplier (sup_id, sup_name, address, city) VALUES
+(1, 'Supplier A', '123 Supplier St', 'New York'),
+(2, 'Supplier B', '456 Distributor Ave', 'Los Angeles'),
+(3, 'Supplier C', '789 Supplier Blvd', 'Chicago'),
+(4, 'Supplier D', '101 Vendor Lane', 'Houston'),
+(5, 'Supplier E', '555 Supplier Road', 'San Francisco');
+
+
+
+create table supplies(
+book_ref_id int,
+sup_ref_id int,
+sup_price int,
+foreign key(book_ref_id)
+	references book(bookid)
+    on delete cascade,
+foreign key(sup_ref_id)
+	references supplier(sup_id)
+	on delete cascade
+);
+
+INSERT INTO supplies (book_ref_id, sup_ref_id, sup_price) VALUES
+(1, 1, 20), -- Supplier A supplying Pride and Prejudice at $20
+(2, 2, 18), -- Supplier B supplying The Great Gatsby at $18
+(3, 3, 22), -- Supplier C supplying 1984 at $22
+(4, 4, 15), -- Supplier D supplying The Catcher in the Rye at $15
+(5, 5, 17); -- Supplier E supplying To Kill a Mockingbird at $17
+
+SELECT DISTINCT au.au_name
+FROM author au
+JOIN writtenby wb ON au.aid = wb.a_ref_id
+JOIN book b ON wb.book_ref_id = b.bookid
+JOIN publishedby pb ON b.bookid = pb.book_ref_id
+WHERE pb.year = 2008;

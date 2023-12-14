@@ -1,0 +1,34 @@
+SELECT DISTINCT pb.pb_name AS Publisher_Name
+FROM publisher pb
+INNER JOIN publishedby p ON pb.pid = p.p_ref_id
+INNER JOIN supplies s ON p.book_ref_id = s.book_ref_id
+WHERE s.sup_price < 19;
+
+SELECT DISTINCT b.title AS Book_Title
+FROM book b
+INNER JOIN publishedby p ON b.bookid = p.book_ref_id
+INNER JOIN supplier s ON p.p_ref_id = s.sup_id
+WHERE s.city != 'New York';
+
+SELECT b.title AS Book_Title, s.sup_price AS Supply_Price
+FROM book b
+INNER JOIN supplies s ON b.bookid = s.book_ref_id
+ORDER BY s.sup_price;
+
+SELECT s.sup_name AS Supplier_Name
+FROM supplier s
+INNER JOIN supplies sp ON s.sup_id = sp.sup_ref_id
+INNER JOIN book b ON sp.book_ref_id = b.bookid
+WHERE b.title = 'To Kill a Mockingbird';
+
+SELECT au.au_name AS Author_Name, au.city AS Author_City
+FROM author au;
+
+CREATE TRIGGER before_insert_book
+BEFORE INSERT ON book
+FOR EACH ROW
+BEGIN
+    DECLARE log_message VARCHAR(255);
+    SET log_message = CONCAT('Inserting into book table: ', NEW.title, ' with ID ', NEW.bookid);
+    INSERT INTO log_table (log_message) VALUES (log_message);
+END;
